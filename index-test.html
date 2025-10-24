@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Watch the Video → Then Answer 1 Question</title>
+  <style>
+    :root { color-scheme: dark; }
+    body {
+      font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      margin: 0;
+      background: #0e0f12;
+      color: #fff;
+    }
+    .wrap { max-width: 840px; margin: 0 auto; padding: 20px; }
+    .card {
+      background: #14161a;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+    }
+    h1 { font-size: 20px; margin: 0 0 12px; }
+    .player-box {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    iframe.player {
+      width: 100%; height: 100%;
+      border: 0; border-radius: 12px;
+    }
+    .hint { opacity: .75; font-size: 14px; margin-top: 8px; }
+    .survey { display: none; margin-top: 16px; }
+    iframe.form {
+      width: 100%;
+      height: 75vh;
+      border: 0;
+      background: #fff;
+      border-radius: 12px;
+    }
+    .btn {
+      display: inline-block;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: #2a6df2;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      border: 0;
+      cursor: pointer;
+    }
+    .btn:active { transform: translateY(1px); }
+    .center { text-align: center; }
+    .muted { opacity: .75; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1 id="title">Please watch the video. The questionnaire will appear automatically when it finishes.</h1>
+
+      <div class="player-box">
+        <!-- 用 data-base 存放基础 URL，稍后用 JS 动态拼接 origin & enablejsapi -->
+        <iframe
+          id="ytFrame"
+          class="player"
+          title="Video"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+          data-base="https://www.youtube.com/embed/MpBhEaRy_d0?rel=0&modestbranding=1&playsinline=1&enablejsapi=1"
+        ></iframe>
+      </div>
+
+      <p id="hint" class="hint">
+        Tip: On mobile, system controls may still appear — this is normal. The questionnaire will show automatically when the video ends.
+      </p>
+
+      <!-- 兜底：若 API 失败或事件未触发，用户可手动打开问卷 -->
+      <div class="center" style="margin-top:16px;">
+        <button id="fallbackBtn" class="btn hidden" type="button" title="Only appears if the player API fails">
+          Open the Questionnaire
+        </button>
+        <span id="fallbackNote" class="hint hidden">If the form doesn’t appear automatically, click the button.</span>
+      </div>
+
+      <div id="survey" class="survey">
+        <h1>Please complete 1 multiple-choice question</h1>
+        <iframe
+          class="form"
+          src="https://docs.google.com/forms/d/e/1FAIpQLSdOLJblK0SaWv-mEd5L8lsHAVtRVrLwPSJDnw0BYNifDI0U6A/viewform?embedded=true"
+          allowfullscreen
+        ></iframe>
+
+        <div class="center" style="margin-top:12px;">
+          <a
+            class="btn"
+            href="https://docs.google.com/forms/d/e/1FAIpQLSdOLJblK0SaWv-mEd5L8lsHAVtRVrLwPSJDnw0BYNifDI0U6A/viewform?usp=header"
+            target="_blank"
+            rel="noopener"
+          >
+            If the form does not display, open it in a new tab
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- YouTube IFrame Player API -->
+  <script src="https://www.youtube.com/iframe_api" async></script>
+
+  <script>
+    // 1) 在 GitHub Pages / 自定义域名上动态设置 iframe src，包含正确的 origin
+    (function setYoutubeSrc() {
+      var frame = document.getElementById('ytFrame');
+      var base = frame.getAttribute('data-base') || '';
+      var origin = encodeURIComponent(location.origin); // 例如 https://yourname.github.io
+      var sep = base.includes('?') ? '&' : '?';
+      frame.src = base + sep + 'origin=' + origin;
+    })();
+
+    // 工具函数：显示问卷
+    function showSurvey() {
+      const survey = document.getElementById("survey");
+      const title = document.getElementById("title");
+      const hint = document.getElementById("hint");
+      survey.style.display = "block";
+      if (title) title.textContent = "Thanks! Please complete the questionnaire below.";
+      if (hint) hint.classList.add("muted");
+      setTimeout(() => survey.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
+    }
+
+    // 兜底 UI
+    function showFallback() {
+      document.getElementById("fallbackBtn").classList.remove("hidden");
+      document.getElementById("fallbackNote").classList.remove("hidden");
+    }
+
+    // 2) 集成 YT API：视频结束则显示问卷
+    let ytPlayer = null;
+    window.onYouTubeIframeAPIReady = function () {
+      try {
+        ytPlayer = new YT.Player("ytFrame", {
+          events: {
+            onReady: function () {
+              // 可选：限制键盘快进（无法完全阻止寻位）
+              try { ytPlayer.setOption("playerVars", { disablekb: 1 }); } catch (e) {}
+            },
+            onStateChange: function (evt) {
+              if (evt.data === YT.PlayerState.ENDED) {
+                showSurvey();
+              }
+            }
+          }
+        });
+      } catch (e) {
+        console.warn("YouTube Player init failed:", e);
+        showFallback();
+      }
+    };
+
+    // 兜底按钮：手动打开问卷
+    document.getElementById("fallbackBtn").addEventListener("click", showSurvey);
+
+    // 如果不是 https（极少数自托管场景），做个兜底提示
+    (function guardForInsecure() {
+      if (location.protocol !== "https:" && location.hostname !== "localhost") {
+        showFallback();
+      }
+    })();
+  </script>
+</body>
+</html>

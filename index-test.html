@@ -14,15 +14,14 @@
     }
     .wrap { max-width: 840px; margin: 0 auto; padding: 20px; }
     .card { background: #14161a; border-radius: 16px; padding: 18px; box-shadow: 0 6px 24px rgba(0,0,0,.25); }
-    h1 { font-size: 20px; margin: 0 0 12px; }
 
     /* Default (desktop) video box */
     .player-box {
       position: relative;
       width: 100%;
-      max-width: 420px;       /* Limit width on desktop */
-      margin: 0 auto;         /* Center horizontally */
-      aspect-ratio: 9 / 16;   /* Vertical format */
+      max-width: 420px;
+      margin: 0 auto;
+      aspect-ratio: 9 / 16;
       background: #000;
       border-radius: 12px;
       overflow: hidden;
@@ -33,7 +32,7 @@
       .player-box {
         max-width: 100%;
         aspect-ratio: auto;
-        height: 100dvh;       /* Full height on mobile Safari */
+        height: 100dvh;
         border-radius: 0;
       }
       iframe.player {
@@ -43,7 +42,7 @@
       body {
         margin: 0;
         padding: 0;
-        overflow: auto;       /* ✅ allow scrolling */
+        overflow: auto; /* allow scrolling */
       }
     }
 
@@ -82,7 +81,8 @@
 <body>
   <div class="wrap">
     <div class="card">
-      <h1 id="title">Please watch the video. The questionnaire will appear automatically when it finishes.</h1>
+
+      <!-- 🔹 Removed the <h1 id="title"> line -->
 
       <div class="player-box">
         <!-- YouTube Shorts video -->
@@ -143,11 +143,9 @@
     // Show the questionnaire
     function showSurvey() {
       const survey = document.getElementById("survey");
-      const title = document.getElementById("title");
       const hint  = document.getElementById("hint");
       if (survey.style.display !== "block") {
         survey.style.display = "block";
-        if (title) title.textContent = "Thank you! Please fill out the questionnaire below.";
         if (hint)  hint.classList.add("muted");
       }
       // ✅ Enable scrolling on mobile

@@ -27,7 +27,7 @@
       overflow: hidden;
     }
 
-    /* 📱 Mobile: fullscreen video, allow scrolling */
+    /* Mobile: fullscreen video, allow scrolling */
     @media (max-width: 600px) {
       .player-box {
         max-width: 100%;
@@ -42,7 +42,7 @@
       body {
         margin: 0;
         padding: 0;
-        overflow: auto; /* allow scrolling */
+        overflow: auto;
       }
     }
 
@@ -53,7 +53,6 @@
       border-radius: 12px;
     }
 
-    .hint { opacity: .75; font-size: 14px; margin-top: 8px; }
     .survey { display: none; margin-top: 16px; }
     iframe.form {
       width: 100%;
@@ -75,33 +74,27 @@
     }
     .btn:active { transform: translateY(1px); }
     .center { text-align: center; }
-    .muted { opacity: .75; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card">
 
-      <!-- 🔹 Removed the <h1 id="title"> line -->
-
       <div class="player-box">
-        <!-- YouTube Shorts video -->
         <iframe
           id="ytFrame"
           class="player"
           title="Video"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowfullscreen
-          data-base="https://www.youtube.com/embed/TAoYnAJLXoQ?rel=0&modestbranding=1&playsinline=1&enablejsapi=1"
+          data-base="https://www.youtube.com/embed/BZy447Pi8eg?rel=0&modestbranding=1&playsinline=1&enablejsapi=1"
         ></iframe>
       </div>
 
-      <!-- Always-visible button -->
       <div class="center" style="margin-top:16px;">
         <button id="openBtn" class="btn" type="button">Go to Questionnaire</button>
       </div>
 
-      <!-- Hidden questionnaire -->
       <div id="survey" class="survey">
         <h1>Please complete the short questionnaire below</h1>
         <iframe
@@ -123,11 +116,9 @@
     </div>
   </div>
 
-  <!-- YouTube IFrame Player API -->
   <script src="https://www.youtube.com/iframe_api" async></script>
 
   <script>
-    // Set YouTube iframe src dynamically (so it works on GitHub Pages)
     (function setYoutubeSrc() {
       const frame = document.getElementById('ytFrame');
       const base = frame.getAttribute('data-base') || '';
@@ -136,23 +127,17 @@
       frame.src = base + sep + 'origin=' + origin;
     })();
 
-    // Show the questionnaire
     function showSurvey() {
       const survey = document.getElementById("survey");
-      const hint  = document.getElementById("hint");
       if (survey.style.display !== "block") {
         survey.style.display = "block";
-        if (hint)  hint.classList.add("muted");
       }
-      // ✅ Enable scrolling on mobile
       document.body.style.overflow = "auto";
       setTimeout(() => survey.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
     }
 
-    // Manual button
     document.getElementById("openBtn").addEventListener("click", showSurvey);
 
-    // YouTube API setup
     let ytPlayer = null;
     window.onYouTubeIframeAPIReady = function () {
       try {

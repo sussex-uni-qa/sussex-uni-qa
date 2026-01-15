@@ -1,1 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Watch the Video → Then Answer One Question</title>
+
+  <style>
+    :root { color-scheme: dark; }
+
+    body {
+      font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      margin: 0;
+      background: #0e0f12;
+      color: #fff;
+    }
+
+    .wrap {
+      max-width: 840px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: #14161a;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 6px 24px rgba(0,0,0,.25);
+    }
+
+    /* Default (desktop) video box */
+    .player-box {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+      aspect-ratio: 9 / 16;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    /* Mobile: fullscreen video, allow scrolling */
+    @media (max-width: 600px) {
+      .player-box {
+        max-width: 100%;
+        aspect-ratio: auto;
+        height: 100dvh;
+        border-radius: 0;
+      }
+
+      iframe.player {
+        width: 100%;
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: auto;
+      }
+    }
+
+    iframe.player {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      border-radius: 12px;
+    }
+
+    .survey {
+      display: none;
+      margin-top: 16px;
+    }
+
+    iframe.form {
+      width: 100%;
+      height: 75vh;
+      border: 0;
+      background: #fff;
+      border-radius: 12px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: #2a6df2;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      border: 0;
+      cursor: pointer;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .center {
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="card">
+
+      <div class="player-box">
+        <iframe
+          id="ytFrame"
+          class="player"
+          title="Video"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+          data-base="https://www.youtube.com/embed/BZy447Pi8eg?rel=0&modestbranding=1&playsinline=1&enablejsapi=1"
+        ></iframe>
+      </div>
+
+      <div class="center" style="margin-top:16px;">
+        <button id="openBtn" class="btn" type="button">
+          Go to Questionnaire
+        </button>
+      </div>
+
+      <div id="survey" class="survey">
+        <h1>Please complete the short questionnaire below</h1>
+
+        <iframe
+          class="form"
+          src="https://docs.google.com/forms/d/e/1FAIpQLScuLqYwCdgpTfRbU0na7Sb-J58LX1ID5FDVxmYqdxyVWBdTyA/viewform?embedded=true"
+          allowfullscreen
+        ></iframe>
+
+        <div class="center" style="margin-top:12px;">
+          <a
+            class="btn"
+            href="https://docs.google.com/forms/d/e/1FAIpQLScuLqYwCdgpTfRbU0na7Sb-J58LX1ID5FDVxmYqdxyVWBdTyA/viewform"
+            target="_blank"
+            rel="noopener"
+          >
+            If the form does not display, open it in a new tab
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- YouTube Iframe API -->
+  <script src="https://www.youtube.com/iframe_api" async></script>
+
+  <script>
+    (function setYoutubeSrc() {
+      const frame = document.getElementById('ytFrame');
+      const base = frame.getAttribute('data-base') || '';
+      const origin = encodeURIComponent(location.origin);
+      const sep = base.includes('?') ? '&' : '?';
+      frame.src = base + sep + 'origin=' + origin;
+    })();
+
+    function showSurvey() {
+      const survey = document.getElementById("survey");
+      if (survey.style.display !== "block") {
+        survey.style.display = "block";
+      }
+      document.body.style.overflow = "auto";
+      setTimeout(() => {
+        survey.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 50);
+    }
+
+    document.getElementById("openBtn").addEventListener("click", showSurvey);
+
+    let ytPlayer = null;
+    window.onYouTubeIframeAPIReady = function () {
+      try {
+        ytPlayer = new YT.Player("ytFrame", {
+          events: {
+            onReady: function () {
+              try {
+                ytPlayer.setOption("playerVars", { disablekb: 1 });
+              } catch (e) {}
+            },
+            onStateChange: function (evt) {
+              if (evt.data === YT.PlayerState.ENDED) {
+                showSurvey();
+              }
+            }
+          }
+        });
+      } catch (e) {
+        console.warn("YouTube Player init failed:", e);
+      }
+    };
+  </script>
+</body>
+</html>
 

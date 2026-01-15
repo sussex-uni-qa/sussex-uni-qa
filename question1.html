@@ -3,16 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Watch the Video → Then Answer One Question</title>
+  <title>Watch the Video and Complete the Questionnaire</title>
 
   <style>
-    :root { color-scheme: dark; }
+    :root {
+      color-scheme: dark;
+    }
 
     body {
       font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
       margin: 0;
       background: #0e0f12;
-      color: #fff;
+      color: #ffffff;
     }
 
     .wrap {
@@ -25,27 +27,21 @@
       background: #14161a;
       border-radius: 16px;
       padding: 18px;
-      box-shadow: 0 6px 24px rgba(0,0,0,.25);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
     }
 
-    /* =======================
-       VIDEO CONTAINER (FIXED)
-       ======================= */
+    /* Video container */
 
     .player-box {
       position: relative;
       width: 100%;
       max-width: 420px;
       margin: 0 auto;
-
       aspect-ratio: 9 / 16;
-      max-height: 70vh;        /* ⭐ 控制视频高度，给按钮留空间 */
-
-      background: #000;
+      max-height: 70vh;
+      background: #000000;
       border-radius: 12px;
       overflow: hidden;
-
-      /* ⭐ 消除 iOS / desktop 圆角白边 */
       line-height: 0;
       font-size: 0;
     }
@@ -55,30 +51,20 @@
       inset: 0;
       width: 100%;
       height: 100%;
-
       border: 0;
-      border-radius: 0;        /* ⭐ 圆角只交给外层容器 */
+      border-radius: 0;
       display: block;
-      background: #000;
-
-      /* ⭐ 极端设备兜底，防止 sub-pixel 缝隙 */
+      background: #000000;
       transform: scale(1.01);
     }
 
-    /* =======================
-       MOBILE TWEAK
-       ======================= */
-
     @media (max-width: 600px) {
       .player-box {
-        max-height: 60vh;      /* 手机上再短一点，更稳 */
-        border-radius: 12px;
+        max-height: 60vh;
       }
     }
 
-    /* =======================
-       SURVEY
-       ======================= */
+    /* Questionnaire */
 
     .survey {
       display: none;
@@ -89,20 +75,18 @@
       width: 100%;
       height: 75vh;
       border: 0;
-      background: #fff;
+      background: #ffffff;
       border-radius: 12px;
     }
 
-    /* =======================
-       BUTTON
-       ======================= */
+    /* Button */
 
     .btn {
       display: inline-block;
       padding: 12px 16px;
       border-radius: 12px;
       background: #2a6df2;
-      color: #fff;
+      color: #ffffff;
       text-decoration: none;
       font-weight: 600;
       border: 0;
@@ -123,7 +107,7 @@
   <div class="wrap">
     <div class="card">
 
-      <!-- VIDEO -->
+      <!-- Video -->
       <div class="player-box">
         <iframe
           id="ytFrame"
@@ -135,14 +119,14 @@
         ></iframe>
       </div>
 
-      <!-- BUTTON -->
-      <div class="center" style="margin-top:18px;">
+      <!-- Action button -->
+      <div class="center" style="margin-top: 18px;">
         <button id="openBtn" class="btn" type="button">
           Go to Questionnaire
         </button>
       </div>
 
-      <!-- SURVEY -->
+      <!-- Questionnaire -->
       <div id="survey" class="survey">
         <h1>Please complete the short questionnaire below</h1>
 
@@ -152,14 +136,14 @@
           allowfullscreen
         ></iframe>
 
-        <div class="center" style="margin-top:12px;">
+        <div class="center" style="margin-top: 12px;">
           <a
             class="btn"
             href="https://docs.google.com/forms/d/e/1FAIpQLScuLqYwCdgpTfRbU0na7Sb-J58LX1ID5FDVxmYqdxyVWBdTyA/viewform"
             target="_blank"
             rel="noopener"
           >
-            If the form does not display, open it in a new tab
+            Open the questionnaire in a new tab if it does not display
           </a>
         </div>
       </div>
@@ -167,19 +151,16 @@
     </div>
   </div>
 
-  <!-- =======================
-       YOUTUBE API
-       ======================= -->
-
+  <!-- YouTube Iframe API -->
   <script src="https://www.youtube.com/iframe_api" async></script>
 
   <script>
-    (function setYoutubeSrc() {
-      const frame = document.getElementById('ytFrame');
-      const base = frame.getAttribute('data-base') || '';
+    (function initialiseYouTubeSrc() {
+      const frame = document.getElementById("ytFrame");
+      const base = frame.getAttribute("data-base") || "";
       const origin = encodeURIComponent(location.origin);
-      const sep = base.includes('?') ? '&' : '?';
-      frame.src = base + sep + 'origin=' + origin;
+      const separator = base.includes("?") ? "&" : "?";
+      frame.src = base + separator + "origin=" + origin;
     })();
 
     function showSurvey() {
@@ -200,15 +181,15 @@
       try {
         ytPlayer = new YT.Player("ytFrame", {
           events: {
-            onStateChange: function (evt) {
-              if (evt.data === YT.PlayerState.ENDED) {
+            onStateChange: function (event) {
+              if (event.data === YT.PlayerState.ENDED) {
                 showSurvey();
               }
             }
           }
         });
-      } catch (e) {
-        console.warn("YouTube Player init failed:", e);
+      } catch (error) {
+        console.warn("YouTube player initialisation failed:", error);
       }
     };
   </script>
